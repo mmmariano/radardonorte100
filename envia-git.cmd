@@ -30,15 +30,15 @@ if errorlevel 1 (
     if errorlevel 1 goto erro
 )
 
-rem Só faz pull se a main já existir no repositório remoto
-git ls-remote --exit-code --heads origin main >nul 2>&1
-if errorlevel 2 goto erro
-if errorlevel 1 goto push
+rem Verifica se a main existe no remoto (captura a saida)
+set "TEM_MAIN="
+for /f "delims=" %%i in ('git ls-remote --heads origin main 2^>nul') do set "TEM_MAIN=1"
 
-git -c core.editor=true pull --no-rebase --no-edit --allow-unrelated-histories origin main
-if errorlevel 1 goto erro
+if defined TEM_MAIN (
+    git -c core.editor=true pull --no-rebase --no-edit --allow-unrelated-histories origin main
+    if errorlevel 1 goto erro
+)
 
-:push
 git push -u origin main
 if errorlevel 1 goto erro
 
